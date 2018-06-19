@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "kki-todo-app",
-    "description": "This project is really great.",
+    "name": "Simple Todo App",
+    "description": "Simple To Do App made with React Native.",
     "slug": "kki-todo-app",
     "privacy": "public",
     "sdkVersion": "28.0.0",
