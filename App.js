@@ -7,7 +7,8 @@ import {
   StatusBar,
   Dimensions,
   TextInput,
-  Platform
+  Platform,
+  AsyncStorage
 } from "react-native";
 import ToDo from "./ToDo";
 import uuidv1 from "uuid/v1";
@@ -49,7 +50,9 @@ export default class App extends React.Component {
             onSubmitEditing={this._addToDo}
           />
           <ScrollView id="eee" contentContainerStyle={styles.toDos}>
-            {Object.values(toDos).map(toDo => (
+            {Object.values(toDos)
+              .reverse()
+              .map(toDo => (
               <ToDo key={toDo.id} 
                     {...toDo} 
                     deleteToDo={this._deleteToDo} 
@@ -71,10 +74,17 @@ export default class App extends React.Component {
     });
   };
 
-  _loadToDos = () => {
-    this.setState({
-      loadedToDos: true
-    });
+  _loadToDos = async () => {
+    try {
+      const loadToDos = await AsyncStorage.getItem("toDos");
+      const parsedToDos = JSON.parse(loadToDos);
+      this.setState({
+        loadedToDos: true,
+        toDos : parsedToDos || {}
+      });
+    } catch(err) {
+      console.log(err);
+    }
   };
 
   _addToDo = () => {
@@ -106,6 +116,7 @@ export default class App extends React.Component {
         console.log(newState);
         console.log("{...newState}");
         console.log({ ...newState });
+        this._saveToDo(newState.toDos);
         return newState;
       });
     }
@@ -123,6 +134,7 @@ export default class App extends React.Component {
           }
         }
       };
+      this._saveToDo(newState.toDos);
       return newState;
     });
   };
@@ -139,6 +151,7 @@ export default class App extends React.Component {
           }
         }
       };
+      this._saveToDo(newState.toDos);
       return newState;
     });
   };
@@ -155,6 +168,7 @@ export default class App extends React.Component {
           }
         }
       };
+      this._saveToDo(newState.toDos);
       return newState;
     });
   };
@@ -168,9 +182,16 @@ export default class App extends React.Component {
         ...prevState,
         toDos
       };
+
+      this._saveToDo(newState.toDos);
       return newState;
     });
   };
+
+  _saveToDo = (newToDos) => {
+    console.log(JSON.stringify(newToDos));
+    const saveToDos = AsyncStorage.setItem("toDos", JSON.stringify(newToDos));
+  }
 }
 
 const styles = StyleSheet.create({
